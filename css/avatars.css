@@ -1,0 +1,278 @@
+/* MSN-Style Avatars */
+:root {
+    --avatar-aqua: #00CED1;
+    --avatar-sky: #87CEEB;
+    --avatar-mint: #98FF98;
+    --avatar-lemon: #FFFACD;
+    --avatar-pink: #FFB6C1;
+    --avatar-lavender: #E6E6FA;
+}
+
+.avatars-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg);
+    width: 800px;
+    height: 800px;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* MSN Avatar Base */
+.msn-avatar {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    pointer-events: auto;
+    transform-style: preserve-3d;
+}
+
+.msn-avatar.large {
+    width: 96px;
+    height: 96px;
+}
+
+.msn-avatar.small {
+    width: 32px;
+    height: 32px;
+}
+
+.msn-avatar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, 
+        rgba(255,255,255,0.8) 0%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(0,0,0,0.1) 100%
+    );
+    box-shadow: 
+        inset 2px 2px 5px rgba(255,255,255,0.8),
+        inset -2px -2px 5px rgba(0,0,0,0.1),
+        3px 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Avatar Colors */
+.msn-avatar[data-color="aqua"] { background: linear-gradient(135deg, #00CED1 0%, #20B2AA 100%); }
+.msn-avatar[data-color="sky"] { background: linear-gradient(135deg, #87CEEB 0%, #5DADE2 100%); }
+.msn-avatar[data-color="mint"] { background: linear-gradient(135deg, #98FF98 0%, #90EE90 100%); }
+.msn-avatar[data-color="lemon"] { background: linear-gradient(135deg, #FFFACD 0%, #F0E68C 100%); }
+.msn-avatar[data-color="pink"] { background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); }
+.msn-avatar[data-color="lavender"] { background: linear-gradient(135deg, #E6E6FA 0%, #DDA0DD 100%); }
+
+/* Avatar Face */
+.msn-avatar::after {
+    content: ':)';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: rgba(0,0,0,0.6);
+    font-family: "Tahoma", sans-serif;
+}
+
+.msn-avatar.large::after {
+    font-size: 40px;
+}
+
+.msn-avatar.small::after {
+    font-size: 14px;
+}
+
+/* Avatar Name Tag */
+.avatar-name-tag {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.95);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Avatar Animation States */
+.msn-avatar.idle {
+    animation: avatar-breathe 3s ease-in-out infinite;
+}
+
+.msn-avatar.walking {
+    animation: avatar-bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes avatar-breathe {
+    0%, 100% { transform: scale(1) translateZ(10px); }
+    50% { transform: scale(1.02) translateZ(12px); }
+}
+
+@keyframes avatar-bounce {
+    0%, 100% { transform: translateZ(10px); }
+    50% { transform: translateZ(20px); }
+}
+
+/* Selected Avatar */
+.msn-avatar.selected {
+    box-shadow: 0 0 0 3px var(--xp-blue), 0 5px 20px rgba(0,0,0,0.3);
+}
+
+/* Pets */
+.pet {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 99;
+}
+
+/* Clownfish Pet */
+.pet-clownfish {
+    animation: pet-swim 2s ease-in-out infinite;
+}
+
+.pet-clownfish::before {
+    content: '🐠';
+    font-size: 20px;
+    position: absolute;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+}
+
+/* Dolphin Pet */
+.pet-dolphin {
+    animation: pet-hop 1.5s ease-in-out infinite;
+}
+
+.pet-dolphin::before {
+    content: '🐬';
+    font-size: 22px;
+    position: absolute;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+}
+
+@keyframes pet-swim {
+    0%, 100% { transform: translate(0, 0) rotate(-5deg); }
+    25% { transform: translate(5px, -5px) rotate(5deg); }
+    50% { transform: translate(0, -8px) rotate(-5deg); }
+    75% { transform: translate(-5px, -5px) rotate(5deg); }
+}
+
+@keyframes pet-hop {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(8px, -15px) rotate(-10deg); }
+    50% { transform: translate(16px, 0) rotate(0deg); }
+    75% { transform: translate(8px, -10px) rotate(10deg); }
+}
+
+/* Pet Following Position Offsets */
+.pet.position-0 { transform: translate(-35px, -10px); }
+.pet.position-1 { transform: translate(35px, -10px); }
+.pet.position-2 { transform: translate(0, -40px); }
+.pet.position-3 { transform: translate(-25px, -35px); }
+.pet.position-4 { transform: translate(25px, -35px); }
+
+/* Avatars in World */
+.world-avatar {
+    position: absolute;
+    transform: translateZ(15px);
+    transition: all 0.3s ease-out;
+}
+
+.world-avatar:hover {
+    transform: translateZ(20px) scale(1.1);
+}
+
+/* Avatar Selection Ring */
+.world-avatar.current-user::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border: 2px dashed rgba(36, 94, 220, 0.5);
+    border-radius: 50%;
+    animation: spin-slow 10s linear infinite;
+}
+
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Customize Page */
+.customize-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.customize-preview {
+    background: linear-gradient(135deg, #E0F6FF 0%, #B8E6FF 100%);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 
+        inset 0 0 20px rgba(255,255,255,0.5),
+        0 5px 20px rgba(0,0,0,0.1);
+}
+
+.customize-options {
+    width: 100%;
+}
+
+.customize-options h3 {
+    margin: 15px 0 10px;
+    color: #333;
+    font-size: 12px;
+}
+
+/* Pets Inventory */
+.pets-inventory {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 8px;
+    min-height: 50px;
+}
+
+.pet-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.pet-item .pet-icon {
+    font-size: 18px;
+}
+
+.no-pets {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+}
+
+/* Equip Section */
+.equip-section {
+    margin-top: 10px;
+}
+
+#petSelect {
+    width: 100%;
+    padding: 6px;
+}

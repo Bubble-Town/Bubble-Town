@@ -1,0 +1,533 @@
+/* Aquarium Fullscreen Modal */
+.fullscreen-modal {
+    position: fixed;
+    inset: 0;
+    background: #001;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+}
+
+.aquarium-room {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, 
+        #001133 0%,
+        #003366 30%,
+        #004488 60%,
+        #0066aa 100%
+    );
+    position: relative;
+    overflow: hidden;
+}
+
+/* Header */
+.aquarium-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 10;
+}
+
+.aquarium-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 24px;
+    font-family: "Tahoma", sans-serif;
+    text-shadow: 0 2px 10px rgba(0,150,255,0.5);
+}
+
+/* Main Tank */
+.aquarium-tank {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tank-background {
+    position: absolute;
+    inset: 0;
+}
+
+/* Coral */
+.coral {
+    position: absolute;
+    bottom: 0;
+    width: 120px;
+    height: 200px;
+    background: linear-gradient(180deg, 
+        #FF6B6B 0%,
+        #FF8E8E 30%,
+        #FF6B9D 60%,
+        #C44569 100%
+    );
+    border-radius: 50% 50% 20% 20%;
+    opacity: 0.8;
+}
+
+.coral-1 {
+    left: 10%;
+    height: 180px;
+    animation: coral-sway 4s ease-in-out infinite;
+}
+
+.coral-2 {
+    right: 15%;
+    height: 220px;
+    background: linear-gradient(180deg, 
+        #A8E6CF 0%,
+        #88D8A3 30%,
+        #7BC8A0 60%,
+        #5AA469 100%
+    );
+    animation: coral-sway 5s ease-in-out infinite reverse;
+}
+
+@keyframes coral-sway {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+}
+
+/* Seaweed */
+.seaweed {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+}
+
+.weed {
+    width: 20px;
+    height: 150px;
+    background: linear-gradient(180deg, 
+        #90EE90 0%,
+        #32CD32 50%,
+        #228B22 100%
+    );
+    border-radius: 50% 50% 0 0;
+    animation: weed-sway 3s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+.weed:nth-child(2) {
+    height: 180px;
+    animation-delay: -1s;
+}
+
+.weed:nth-child(3) {
+    height: 120px;
+    animation-delay: -2s;
+}
+
+@keyframes weed-sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Sand */
+.sand {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, 
+        #F4E4C1 0%,
+        #E6D5A7 50%,
+        #D4C59A 100%
+    );
+    border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+}
+
+/* Fish Container */
+.fish-container {
+    position: absolute;
+    inset: 0;
+}
+
+/* Clownfish */
+.clownfish {
+    position: absolute;
+    animation: fish-swim-across 15s linear infinite;
+}
+
+.clownfish:nth-child(1) {
+    top: 30%;
+    animation-duration: 18s;
+    animation-delay: 0s;
+}
+
+.clownfish:nth-child(2) {
+    top: 50%;
+    animation-duration: 22s;
+    animation-delay: -5s;
+    transform: scale(0.8);
+}
+
+.clownfish:nth-child(3) {
+    top: 65%;
+    animation-duration: 20s;
+    animation-delay: -10s;
+    transform: scale(0.9);
+}
+
+.fish-body {
+    position: relative;
+    width: 60px;
+    height: 40px;
+}
+
+.fish-body::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B35 0%, #FF8C42 50%, #FF6B35 100%);
+    border-radius: 50% 40% 40% 50%;
+    box-shadow: 
+        inset 3px 3px 10px rgba(255,255,255,0.3),
+        inset -3px -3px 10px rgba(0,0,0,0.1);
+}
+
+.stripe {
+    position: absolute;
+    width: 12px;
+    height: 100%;
+    background: white;
+    border-radius: 50%;
+}
+
+.stripe:nth-child(1) { left: 15px; }
+.stripe:nth-child(2) { right: 15px; }
+
+.fin {
+    position: absolute;
+    width: 20px;
+    height: 15px;
+    background: #FF8C42;
+    top: -5px;
+    left: 20px;
+    border-radius: 50% 50% 0 0;
+    border: 2px solid white;
+}
+
+.tail {
+    position: absolute;
+    width: 25px;
+    height: 30px;
+    right: -15px;
+    top: 5px;
+    background: #FF6B35;
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
+    animation: tail-wag 0.5s ease-in-out infinite;
+}
+
+.eye {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    left: 10px;
+    top: 10px;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+@keyframes fish-swim-across {
+    0% {
+        left: -100px;
+        transform: scaleX(1);
+    }
+    45% {
+        transform: scaleX(1);
+    }
+    50% {
+        left: calc(100% + 50px);
+        transform: scaleX(1);
+    }
+    51% {
+        transform: scaleX(-1);
+    }
+    95% {
+        transform: scaleX(-1);
+    }
+    100% {
+        left: -100px;
+        transform: scaleX(-1);
+    }
+}
+
+@keyframes tail-wag {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+}
+
+/* Dolphin */
+.dolphin-container {
+    position: absolute;
+    inset: 0;
+}
+
+.dolphin {
+    position: absolute;
+    top: 25%;
+    left: -150px;
+    animation: dolphin-swim 25s linear infinite;
+}
+
+.dolphin-body {
+    width: 120px;
+    height: 60px;
+    background: linear-gradient(180deg, 
+        #A8D8EA 0%,
+        #7FBCD2 50%,
+        #5A9DB0 100%
+    );
+    border-radius: 60% 40% 40% 60%;
+    position: relative;
+    box-shadow: 
+        inset 5px 5px 15px rgba(255,255,255,0.4),
+        inset -5px -5px 15px rgba(0,0,0,0.1);
+}
+
+.dolphin-body::before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: white;
+    border-radius: 50%;
+    left: 20px;
+    top: 15px;
+    box-shadow: inset 3px 3px 0 #333;
+}
+
+.dolphin-body::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 0;
+    border-top: 20px solid #5A9DB0;
+    right: -35px;
+    top: 10px;
+}
+
+.dolphin-fin {
+    position: absolute;
+    width: 30px;
+    height: 40px;
+    background: #7FBCD2;
+    border-radius: 50% 50% 50% 0;
+    top: -20px;
+    left: 40px;
+    transform: rotate(-20deg);
+}
+
+.dolphin-tail {
+    position: absolute;
+    width: 50px;
+    height: 40px;
+    right: -40px;
+    top: 10px;
+}
+
+.dolphin-tail::before,
+.dolphin-tail::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 25px;
+    background: #5A9DB0;
+    border-radius: 0 50% 50% 50%;
+}
+
+.dolphin-tail::before {
+    transform: rotate(-30deg);
+    top: -10px;
+}
+
+.dolphin-tail::after {
+    transform: rotate(30deg);
+    bottom: -10px;
+}
+
+@keyframes dolphin-swim {
+    0% {
+        left: -150px;
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-50px);
+    }
+    50% {
+        left: calc(100% + 100px);
+        transform: translateY(0);
+    }
+    51% {
+        transform: scaleX(-1);
+    }
+    75% {
+        transform: translateY(-30px) scaleX(-1);
+    }
+    100% {
+        left: -150px;
+        transform: translateY(0) scaleX(-1);
+    }
+}
+
+/* Aquarium Bubbles */
+.aquarium-bubbles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.aq-bubble {
+    position: absolute;
+    background: radial-gradient(circle at 30% 30%, 
+        rgba(255,255,255,0.6) 0%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(255,255,255,0.1) 100%
+    );
+    border-radius: 50%;
+    animation: aq-bubble-rise 8s ease-in infinite;
+    bottom: 80px;
+}
+
+.aq-bubble:nth-child(1) { width: 10px; height: 10px; left: 20%; animation-delay: 0s; }
+.aq-bubble:nth-child(2) { width: 15px; height: 15px; left: 35%; animation-delay: -1s; }
+.aq-bubble:nth-child(3) { width: 8px; height: 8px; left: 50%; animation-delay: -2s; }
+.aq-bubble:nth-child(4) { width: 12px; height: 12px; left: 65%; animation-delay: -3s; }
+.aq-bubble:nth-child(5) { width: 10px; height: 10px; left: 80%; animation-delay: -4s; }
+.aq-bubble:nth-child(6) { width: 14px; height: 14px; left: 10%; animation-delay: -5s; }
+
+@keyframes aq-bubble-rise {
+    0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(-50vh) translateX(20px) scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(-10px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* Light Rays */
+.light-rays {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.ray {
+    position: absolute;
+    width: 100px;
+    height: 150%;
+    background: linear-gradient(180deg, 
+        rgba(255,255,255,0.15) 0%,
+        rgba(255,255,255,0.05) 50%,
+        transparent 100%
+    );
+    transform-origin: top center;
+    animation: ray-shimmer 6s ease-in-out infinite;
+}
+
+.ray:nth-child(1) {
+    left: 20%;
+    transform: rotate(-15deg);
+}
+
+.ray:nth-child(2) {
+    left: 50%;
+    transform: rotate(0deg);
+    animation-delay: -2s;
+}
+
+.ray:nth-child(3) {
+    left: 80%;
+    transform: rotate(15deg);
+    animation-delay: -4s;
+}
+
+@keyframes ray-shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* Aquarium Info Panel */
+.aquarium-info {
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.time-tracker h3 {
+    color: white;
+    margin: 0 0 15px;
+    font-size: 18px;
+    font-family: "Tahoma", sans-serif;
+}
+
+.time-tracker h3 span {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.unlock-progress {
+    display: flex;
+    gap: 30px;
+}
+
+.progress-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s;
+}
+
+.progress-item.unlocked {
+    background: rgba(100, 255, 100, 0.2);
+    box-shadow: 0 0 20px rgba(100, 255, 100, 0.3);
+}
+
+.reward-icon {
+    font-size: 24px;
+}
+
+.reward-text {
+    color: white;
+    font-size: 14px;
+}
+
+.reward-status {
+    font-size: 16px;
+}
+
+.reward-status.locked {
+    opacity: 0.5;
+}
+
+.reward-status.unlocked {
+    color: #FFD700;
+}

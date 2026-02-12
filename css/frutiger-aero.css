@@ -1,0 +1,608 @@
+/* Frutiger Aero Visual Effects */
+
+/* Isometric World Container */
+.isometric-world {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    perspective: 1000px;
+    overflow: hidden;
+    background: linear-gradient(180deg, 
+        #E0F6FF 0%, 
+        #B8E6FF 30%,
+        #87CEEB 60%,
+        #98D8C8 100%
+    );
+}
+
+/* World Grid */
+.world-grid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg);
+    width: 800px;
+    height: 800px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px;
+}
+
+.world-grid::before {
+    content: '';
+    position: absolute;
+    inset: -50px;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 98px,
+            rgba(255,255,255,0.1) 98px,
+            rgba(255,255,255,0.1) 100px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 98px,
+            rgba(255,255,255,0.1) 98px,
+            rgba(255,255,255,0.1) 100px
+        );
+    pointer-events: none;
+}
+
+.grid-tile {
+    background: linear-gradient(135deg, 
+        rgba(144, 238, 144, 0.6) 0%,
+        rgba(152, 251, 152, 0.8) 50%,
+        rgba(144, 238, 144, 0.6) 100%
+    );
+    border-radius: 4px;
+    box-shadow: 
+        inset 1px 1px 0 rgba(255,255,255,0.4),
+        inset -1px -1px 0 rgba(0,0,0,0.1);
+}
+
+/* World Objects Container */
+.world-objects {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateX(60deg) rotateZ(-45deg);
+    width: 800px;
+    height: 800px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+}
+
+/* Eco House */
+.building {
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.eco-house .building-3d {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    transform: translateZ(20px);
+}
+
+.eco-house .walls {
+    position: absolute;
+    width: 100%;
+    height: 80%;
+    bottom: 0;
+    background: linear-gradient(135deg, #F5F5DC 0%, #E8E4C9 100%);
+    border-radius: 4px;
+    box-shadow: 
+        inset 2px 2px 0 rgba(255,255,255,0.5),
+        5px 5px 15px rgba(0,0,0,0.2);
+}
+
+.eco-house .roof {
+    position: absolute;
+    width: 110%;
+    height: 35%;
+    top: -5%;
+    left: -5%;
+    background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
+    border-radius: 4px 4px 0 0;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+.eco-house .solar-panel {
+    position: absolute;
+    width: 40%;
+    height: 25%;
+    top: 10%;
+    left: 10%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 2px;
+    box-shadow: inset 0 0 5px rgba(100,150,255,0.5);
+}
+
+.eco-house .window {
+    position: absolute;
+    width: 25%;
+    height: 35%;
+    top: 30%;
+    right: 15%;
+    background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 50%, #87CEEB 100%);
+    border-radius: 2px;
+    box-shadow: 
+        inset 2px 2px 5px rgba(255,255,255,0.8),
+        inset -2px -2px 5px rgba(0,0,0,0.1);
+}
+
+/* Wind Turbine */
+.wind-turbine {
+    position: relative;
+}
+
+.turbine-base {
+    position: absolute;
+    width: 8%;
+    height: 60%;
+    bottom: 0;
+    left: 46%;
+    background: linear-gradient(90deg, #ddd 0%, #fff 50%, #ddd 100%);
+    border-radius: 2px;
+}
+
+.turbine-blades {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    top: 5%;
+    left: 10%;
+    animation: spin 4s linear infinite;
+}
+
+.blade {
+    position: absolute;
+    width: 45%;
+    height: 12%;
+    background: linear-gradient(180deg, #fff 0%, #eee 100%);
+    border-radius: 50% 10% 10% 50%;
+    top: 44%;
+    left: 50%;
+    transform-origin: left center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.blade:nth-child(1) { transform: rotate(0deg); }
+.blade:nth-child(2) { transform: rotate(120deg); }
+.blade:nth-child(3) { transform: rotate(240deg); }
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Trees */
+.tree {
+    position: relative;
+}
+
+.trunk {
+    position: absolute;
+    width: 20%;
+    height: 40%;
+    bottom: 0;
+    left: 40%;
+    background: linear-gradient(90deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
+    border-radius: 2px;
+}
+
+.leaves {
+    position: absolute;
+    width: 80%;
+    height: 60%;
+    top: 5%;
+    left: 10%;
+    background: radial-gradient(ellipse at center, 
+        #90EE90 0%, 
+        #32CD32 40%,
+        #228B22 100%
+    );
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 
+        inset -5px -5px 10px rgba(0,100,0,0.2),
+        3px 5px 10px rgba(0,0,0,0.2);
+}
+
+/* Pond */
+.pond {
+    position: relative;
+}
+
+.water {
+    position: absolute;
+    width: 85%;
+    height: 85%;
+    top: 7%;
+    left: 7%;
+    background: linear-gradient(135deg, 
+        rgba(64, 164, 223, 0.8) 0%,
+        rgba(100, 200, 255, 0.9) 50%,
+        rgba(64, 164, 223, 0.8) 100%
+    );
+    border-radius: 40% 60% 60% 40% / 60% 40% 60% 40%;
+    box-shadow: 
+        inset 5px 5px 15px rgba(255,255,255,0.4),
+        inset -5px -5px 15px rgba(0,100,150,0.2),
+        0 5px 15px rgba(0,0,0,0.1);
+}
+
+.water-ripple {
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    top: 20%;
+    left: 20%;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    animation: ripple 3s ease-out infinite;
+}
+
+.water-ripple.delay-1 { animation-delay: -1s; }
+.water-ripple.delay-2 { animation-delay: -2s; }
+
+@keyframes ripple {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Aquarium Building */
+.aquarium-building {
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.aquarium-building:hover {
+    transform: scale(1.05);
+}
+
+.aquarium-3d {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+}
+
+.tank-glass {
+    position: absolute;
+    width: 85%;
+    height: 70%;
+    top: 5%;
+    left: 7%;
+    background: linear-gradient(135deg, 
+        rgba(200, 240, 255, 0.4) 0%,
+        rgba(173, 216, 230, 0.5) 50%,
+        rgba(135, 206, 235, 0.4) 100%
+    );
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 8px;
+    box-shadow: 
+        inset 3px 3px 10px rgba(255,255,255,0.5),
+        inset -3px -3px 10px rgba(0,100,150,0.1),
+        5px 10px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.tank-water {
+    position: absolute;
+    inset: 5%;
+    background: linear-gradient(180deg,
+        rgba(64, 164, 223, 0.7) 0%,
+        rgba(0, 119, 190, 0.8) 100%
+    );
+    border-radius: 4px;
+}
+
+.tank-bubbles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.bubble {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle at 30% 30%, 
+        rgba(255,255,255,0.9) 0%,
+        rgba(255,255,255,0.4) 50%,
+        rgba(255,255,255,0.1) 100%
+    );
+    border-radius: 50%;
+    animation: bubble-rise 2s ease-in infinite;
+    bottom: 10%;
+}
+
+.bubble:nth-child(1) { left: 20%; animation-delay: 0s; }
+.bubble:nth-child(2) { left: 50%; animation-delay: -0.5s; }
+.bubble:nth-child(3) { left: 70%; animation-delay: -1s; }
+.bubble:nth-child(4) { left: 35%; animation-delay: -1.5s; }
+
+@keyframes bubble-rise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+.fish-tank {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.tank-fish {
+    position: absolute;
+    width: 20px;
+    height: 12px;
+    background: linear-gradient(90deg, #FF6B35 0%, #FF8C42 100%);
+    border-radius: 50% 40% 40% 50%;
+    top: 50%;
+    left: 50%;
+    animation: fish-swim 4s ease-in-out infinite;
+}
+
+.tank-fish::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    right: -4px;
+    top: 2px;
+}
+
+@keyframes fish-swim {
+    0%, 100% { transform: translate(-20px, -5px); }
+    25% { transform: translate(20px, 5px); }
+    50% { transform: translate(20px, -5px); }
+    75% { transform: translate(-20px, 5px); }
+}
+
+.tank-base {
+    position: absolute;
+    width: 90%;
+    height: 15%;
+    bottom: 5%;
+    left: 5%;
+    background: linear-gradient(180deg, #8B7355 0%, #654321 100%);
+    border-radius: 0 0 4px 4px;
+}
+
+.click-hint {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.9);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.aquarium-building:hover .click-hint {
+    opacity: 1;
+}
+
+/* Flowers */
+.flower {
+    position: relative;
+}
+
+.stem {
+    position: absolute;
+    width: 8%;
+    height: 50%;
+    bottom: 0;
+    left: 46%;
+    background: linear-gradient(90deg, #228B22 0%, #32CD32 100%);
+    border-radius: 2px;
+}
+
+.petals {
+    position: absolute;
+    width: 60%;
+    height: 40%;
+    top: 5%;
+    left: 20%;
+    background: radial-gradient(circle, #FFB6C1 0%, #FF69B4 100%);
+    border-radius: 50%;
+    box-shadow: 
+        -10px 0 0 -5px #FFB6C1,
+        10px 0 0 -5px #FFB6C1,
+        0 -10px 0 -5px #FFB6C1,
+        0 10px 0 -5px #FFB6C1;
+}
+
+.petals.pink {
+    background: radial-gradient(circle, #DDA0DD 0%, #DA70D6 100%);
+    box-shadow: 
+        -10px 0 0 -5px #DDA0DD,
+        10px 0 0 -5px #DDA0DD,
+        0 -10px 0 -5px #DDA0DD,
+        0 10px 0 -5px #DDA0DD;
+}
+
+/* Clouds */
+.cloud {
+    position: absolute;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.cloud-puff {
+    position: absolute;
+    background: linear-gradient(180deg, 
+        rgba(255,255,255,0.9) 0%,
+        rgba(255,255,255,0.7) 100%
+    );
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.cloud-puff:nth-child(1) {
+    width: 60px;
+    height: 40px;
+}
+
+.cloud-puff:nth-child(2) {
+    width: 50px;
+    height: 35px;
+    left: 30px;
+    top: -10px;
+}
+
+.cloud-puff:nth-child(3) {
+    width: 45px;
+    height: 30px;
+    left: 55px;
+    top: 5px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(30px) translateY(-10px); }
+    50% { transform: translateX(50px) translateY(0); }
+    75% { transform: translateX(20px) translateY(10px); }
+}
+
+/* Ambient Glow */
+.ambient-glow {
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(152, 251, 152, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Shimmer Overlay */
+.shimmer-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255,255,255,0.1) 50%,
+        transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 200% 0; }
+    50% { background-position: -200% 0; }
+}
+
+/* Floating Aero Bubbles */
+.floating-bubbles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.aero-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, 
+        rgba(255,255,255,0.8) 0%,
+        rgba(255,255,255,0.2) 40%,
+        rgba(173, 216, 230, 0.3) 100%
+    );
+    box-shadow: 
+        inset -2px -2px 6px rgba(0,100,150,0.1),
+        0 0 10px rgba(255,255,255,0.3);
+    animation: float-bubble 15s ease-in-out infinite;
+}
+
+.aero-bubble:nth-child(1) {
+    width: 40px;
+    height: 40px;
+    left: 10%;
+    bottom: -50px;
+    animation-duration: 12s;
+    animation-delay: 0s;
+}
+
+.aero-bubble:nth-child(2) {
+    width: 25px;
+    height: 25px;
+    left: 30%;
+    bottom: -30px;
+    animation-duration: 18s;
+    animation-delay: -3s;
+}
+
+.aero-bubble:nth-child(3) {
+    width: 35px;
+    height: 35px;
+    left: 60%;
+    bottom: -40px;
+    animation-duration: 14s;
+    animation-delay: -6s;
+}
+
+.aero-bubble:nth-child(4) {
+    width: 20px;
+    height: 20px;
+    left: 80%;
+    bottom: -25px;
+    animation-duration: 20s;
+    animation-delay: -9s;
+}
+
+.aero-bubble:nth-child(5) {
+    width: 30px;
+    height: 30px;
+    left: 45%;
+    bottom: -35px;
+    animation-duration: 16s;
+    animation-delay: -12s;
+}
+
+@keyframes float-bubble {
+    0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(-50vh) translateX(30px) scale(1.1);
+    }
+    90% {
+        opacity: 0.4;
+    }
+    100% {
+        transform: translateY(-110vh) translateX(-20px) scale(0.9);
+        opacity: 0;
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "frutiger-world",
+  "version": "1.0.0",
+  "description": "A nostalgic Frutiger Aero themed isometric virtual world inspired by Habbo Hotel and Club Penguin, featuring Windows XP aesthetics and MSN-style avatars.",
+  "main": "index.js",
+  "dependencies": {
+    "netlify-cli": "^23.15.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
