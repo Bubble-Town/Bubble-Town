@@ -21,13 +21,20 @@ const ADMIN_EMAIL = 'a.hannaway.contact@gmail.com';
 let currentUser = null;
 let userData = null;
 
-// DOM Elements
-const authModal = document.getElementById('authModal');
-const gameInterface = document.getElementById('gameInterface');
-const userBar = document.getElementById('userBar');
+// DOM Elements (lazy load)
+let authModal, gameInterface, userBar;
+
+function getElements() {
+    if (!authModal) {
+        authModal = document.getElementById('authModal');
+        gameInterface = document.getElementById('gameInterface');
+        userBar = document.getElementById('userBar');
+    }
+}
 
 // Auth state listener
 onAuthStateChanged(auth, async (user) => {
+    getElements();
     if (user) {
         currentUser = user;
         await loadUserData(user.uid);
@@ -100,31 +107,35 @@ function createDefaultUserData() {
 
 // Show auth modal
 function showAuthModal() {
-    authModal.classList.remove('hidden');
-    gameInterface.classList.add('hidden');
-    userBar.classList.add('hidden');
+    getElements();
+    if (authModal) authModal.classList.remove('hidden');
+    if (gameInterface) gameInterface.classList.add('hidden');
+    if (userBar) userBar.classList.add('hidden');
 }
 
 // Show game interface
 function showGameInterface() {
+    getElements();
     // Check if user is blocked
     if (userData?.isBlocked) {
         alert('Your account has been blocked. Reason: ' + (userData.blockedReason || 'Violation of community guidelines'));
         signOut(auth);
         return;
     }
-    authModal.classList.add('hidden');
-    gameInterface.classList.remove('hidden');
-    userBar.classList.remove('hidden');
+    if (authModal) authModal.classList.add('hidden');
+    if (gameInterface) gameInterface.classList.remove('hidden');
+    if (userBar) userBar.classList.remove('hidden');
 }
 
 // Update user bar
 function updateUserBar() {
     if (!currentUser) return;
     
-    document.getElementById('userName').textContent = currentUser.displayName || 'User';
+    const userNameEl = document.getElementById('userName');
     const avatarEl = document.getElementById('userAvatarSmall');
-    avatarEl.setAttribute('data-color', userData?.color || 'aqua');
+    
+    if (userNameEl) userNameEl.textContent = currentUser.displayName || 'User';
+    if (avatarEl) avatarEl.setAttribute('data-color', userData?.color || 'aqua');
 }
 
 // Email/Password Registration
@@ -294,9 +305,15 @@ function showAgeVerificationModal(user) {
 }
 
 // Google Sign In
-document.getElementById('googleSignIn')?.addEventListener('click', async () => {
+document.getElementById('googleSignIn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Google sign-in clicked');
+    
     try {
+        console.log('Starting Google sign-in...');
         const result = await signInWithPopup(auth, googleProvider);
+        console.log('Google sign-in result:', result);
         const user = result.user;
         
         // Check if new user
@@ -308,6 +325,7 @@ document.getElementById('googleSignIn')?.addEventListener('click', async () => {
             showAgeVerificationModal(user);
         }
     } catch (error) {
+        console.error('Google sign-in error:', error);
         alert('Google sign-in error: ' + error.message);
     }
 });
