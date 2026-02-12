@@ -2,551 +2,261 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bubble Town - Virtual Eco Town</title>
-    <link rel="stylesheet" href="css/xp-ui.css">
-    <link rel="stylesheet" href="css/frutiger-aero.css">
-    <link rel="stylesheet" href="css/avatars.css">
-    <link rel="stylesheet" href="css/aquarium.css">
-    <link rel="stylesheet" href="css/chat.css">
-    <link rel="stylesheet" href="css/social.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bubble Town</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; overflow: hidden; touch-action: none; }
+        
+        /* Auth Screen */
+        #authScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .authBox {
+            background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .authBox h1 { text-align: center; color: #667eea; margin-bottom: 20px; }
+        .inputGroup { margin-bottom: 15px; }
+        .inputGroup label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .inputGroup input {
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;
+        }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px;
+            font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btnPrimary { background: #667eea; color: white; }
+        .btnGoogle { background: #4285f4; color: white; }
+        .authToggle { text-align: center; margin-top: 15px; color: #666; }
+        .authToggle a { color: #667eea; cursor: pointer; text-decoration: underline; }
+        .errorMsg { color: #e74c3c; text-align: center; margin-bottom: 10px; min-height: 20px; }
+        
+        /* Game Screen */
+        #gameScreen { display: none; width: 100vw; height: 100vh; position: relative; }
+        
+        /* World */
+        #worldContainer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #90EE90 50%, #228B22 100%);
+            overflow: hidden;
+        }
+        #world {
+            position: absolute; top: 50%; left: 50%; width: 2000px; height: 2000px;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Avatar */
+        .avatar {
+            position: absolute; width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            transition: all 0.1s; z-index: 100; border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .avatarName {
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; border-radius: 10px;
+            font-size: 12px; white-space: nowrap;
+        }
+        
+        /* Aquarium Building */
+        .aquariumBuilding {
+            position: absolute; width: 80px; height: 80px; left: 500px; top: 500px;
+            background: linear-gradient(135deg, #4fc3f7 0%, #0288d1 100%);
+            border-radius: 15px; display: flex; align-items: center; justify-content: center;
+            font-size: 40px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 50;
+        }
+        .aquariumBuilding::after { content: '🐠'; }
+        
+        /* Chat */
+        #chatContainer {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 150px;
+            background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
+        }
+        #chatMessages {
+            flex: 1; overflow-y: auto; padding: 10px; font-size: 14px; color: white;
+        }
+        .chatMsg { margin-bottom: 8px; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 8px; }
+        .chatMsg .user { color: #667eea; font-weight: bold; }
+        #chatInputArea { display: flex; padding: 10px; gap: 10px; }
+        #chatInput {
+            flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 16px;
+        }
+        #chatSend { padding: 12px 20px; background: #667eea; color: white; border: none; border-radius: 8px; }
+        
+        /* Mobile Controls */
+        #mobileControls {
+            display: none; position: absolute; bottom: 160px; left: 20px; z-index: 200;
+        }
+        .dPad {
+            width: 120px; height: 120px; position: relative;
+        }
+        .dPadBtn {
+            position: absolute; width: 40px; height: 40px; background: rgba(255,255,255,0.8);
+            border: none; border-radius: 8px; font-size: 20px; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .dPadUp { top: 0; left: 40px; }
+        .dPadDown { bottom: 0; left: 40px; }
+        .dPadLeft { top: 40px; left: 0; }
+        .dPadRight { top: 40px; right: 0; }
+        
+        /* Aquarium Modal */
+        #aquariumModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, #001f3f 0%, #003366 100%); z-index: 500;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .aquariumTimer {
+            position: absolute; top: 20px; right: 20px; color: white; font-size: 24px;
+            background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px;
+        }
+        .fish { position: absolute; font-size: 50px; animation: swim 8s linear infinite; }
+        @keyframes swim { 0% { transform: translateX(-100px); } 100% { transform: translateX(calc(100vw + 100px)); } }
+        .closeAquarium {
+            position: absolute; top: 20px; left: 20px; padding: 12px 24px;
+            background: #e74c3c; color: white; border: none; border-radius: 8px;
+            font-size: 16px; cursor: pointer;
+        }
+        
+        /* Sidebar */
+        #sidebar {
+            position: absolute; top: 10px; right: 10px; width: 200px;
+            background: rgba(0,0,0,0.8); border-radius: 10px; padding: 15px; color: white;
+        }
+        #sidebar h3 { margin-bottom: 10px; color: #667eea; font-size: 14px; }
+        .sidebarItem { padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+        
+        /* Toast */
+        #toastContainer {
+            position: fixed; top: 80px; right: 10px; z-index: 2500;
+        }
+        .toast {
+            background: white; padding: 12px 20px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .authBox { padding: 20px; }
+            #chatContainer { height: 120px; }
+            #mobileControls { display: block; }
+            #sidebar { width: 150px; font-size: 12px; }
+            .aquariumTimer { font-size: 18px; padding: 10px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Auth Modal -->
-    <div id="authModal" class="xp-window modal-center">
-        <div class="xp-title-bar">
-            <span class="xp-icon">🔐</span>
-            <span class="xp-title">Welcome to Bubble Town</span>
-            <div class="xp-buttons">
-                <button class="xp-minimize">_</button>
-                <button class="xp-maximize">□</button>
-                <button class="xp-close">×</button>
-            </div>
-        </div>
-        <div class="xp-content">
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Sign In</button>
-                <button class="auth-tab" data-tab="register">Register</button>
+    <!-- Auth Screen -->
+    <div id="authScreen">
+        <div class="authBox">
+            <h1>🫧 Bubble Town</h1>
+            <div class="errorMsg" id="errorMsg"></div>
+            
+            <div id="loginForm">
+                <div class="inputGroup">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <div class="inputGroup">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Password">
+                </div>
+                <button class="btn btnPrimary" onclick="login()">Sign In</button>
+                <button class="btn btnGoogle" onclick="googleLogin()">Sign in with Google</button>
+                <div class="authToggle">
+                    Don't have an account? <a onclick="showRegister()">Register</a>
+                </div>
             </div>
             
-            <div id="loginForm" class="auth-form">
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" id="loginEmail" class="xp-input" placeholder="your@email.com">
+            <div id="registerForm" style="display:none;">
+                <div class="inputGroup">
+                    <label>Name</label>
+                    <input type="text" id="regName" placeholder="Your name" maxlength="15">
                 </div>
-                <div class="form-group">
-                    <label>Password:</label>
-                    <input type="password" id="loginPassword" class="xp-input" placeholder="••••••••">
+                <div class="inputGroup">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="your@email.com">
                 </div>
-                <button id="loginBtn" class="xp-button-primary" onclick="signInWithEmail()">Sign In</button>
-                <div class="divider">or</div>
-                <button id="googleSignIn" class="xp-button-google" onclick="signInWithGoogle()">
-                    <img src="https://www.google.com/favicon.ico" alt="Google">
-                    Sign in with Google
-                </button>
-            </div>
-            
-            <div id="registerForm" class="auth-form hidden">
-                <div class="form-group">
-                    <label>Display Name:</label>
-                    <input type="text" id="registerName" class="xp-input" placeholder="Your name">
+                <div class="inputGroup">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Min 6 characters">
                 </div>
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" id="registerEmail" class="xp-input" placeholder="your@email.com">
+                <div class="inputGroup">
+                    <label>Birth Date</label>
+                    <input type="date" id="regBirthdate">
                 </div>
-                <div class="form-group">
-                    <label>Password:</label>
-                    <input type="password" id="registerPassword" class="xp-input" placeholder="••••••••">
+                <div class="inputGroup">
+                    <label><input type="checkbox" id="ageConfirm"> I am 13+ years old</label>
                 </div>
-                <div class="form-group">
-                    <label>Date of Birth:</label>
-                    <input type="date" id="registerBirthDate" class="xp-input" required>
-                </div>
-                <div class="form-group age-verification">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="ageConfirm" required>
-                        <span>I confirm I am 13 years or older</span>
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label>Choose Your Color:</label>
-                    <div class="color-picker">
-                        <div class="color-option" data-color="aqua" style="background: #00CED1;"></div>
-                        <div class="color-option" data-color="sky" style="background: #87CEEB;"></div>
-                        <div class="color-option" data-color="mint" style="background: #98FF98;"></div>
-                        <div class="color-option" data-color="lemon" style="background: #FFFACD;"></div>
-                        <div class="color-option" data-color="pink" style="background: #FFB6C1;"></div>
-                        <div class="color-option" data-color="lavender" style="background: #E6E6FA;"></div>
-                    </div>
-                </div>
-                <button id="registerBtn" class="xp-button-primary" onclick="registerWithEmail()">Create Account</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Game Interface -->
-    <div id="gameInterface" class="hidden">
-        <!-- Top Bar -->
-        <div class="xp-taskbar">
-            <div class="xp-start-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Windows_logo_-_2012.svg/1024px-Windows_logo_-_2012.svg.png" alt="Start">
-                <span>Start</span>
-            </div>
-            <div class="xp-taskbar-items">
-                <div class="taskbar-item active" data-window="world">
-                    <span>🫧</span> Bubble Town
-                </div>
-                <div class="taskbar-item" data-window="aquarium">
-                    <span>🐠</span> Aquarium
-                </div>
-                <div class="taskbar-item" data-window="customize">
-                    <span>👤</span> My Avatar
-                </div>
-            </div>
-            <div class="xp-clock" id="clock">12:00 PM</div>
-        </div>
-
-        <!-- Main World Window -->
-        <div id="worldWindow" class="xp-window game-window">
-            <div class="xp-title-bar">
-                <span class="xp-icon">🌍</span>
-                <span class="xp-title">Frutiger Eco Town</span>
-                <div class="xp-buttons">
-                    <button class="xp-minimize">_</button>
-                    <button class="xp-maximize">□</button>
-                    <button class="xp-close">×</button>
-                </div>
-            </div>
-            <div class="xp-content world-container">
-                <!-- Isometric World -->
-                <div id="isometricWorld" class="isometric-world">
-                    <!-- Grid tiles -->
-                    <div class="world-grid">
-                        <!-- Generated by JS -->
-                    </div>
-                    
-                    <!-- Buildings and Objects -->
-                    <div class="world-objects">
-                        <!-- Eco House -->
-                        <div class="building eco-house" style="grid-column: 3; grid-row: 3;">
-                            <div class="building-3d">
-                                <div class="roof"></div>
-                                <div class="walls">
-                                    <div class="solar-panel"></div>
-                                    <div class="window"></div>
-                                </div>
-                                <div class="shadow"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Wind Turbine -->
-                        <div class="building wind-turbine" style="grid-column: 6; grid-row: 2;">
-                            <div class="turbine-base"></div>
-                            <div class="turbine-blades">
-                                <div class="blade"></div>
-                                <div class="blade"></div>
-                                <div class="blade"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tree -->
-                        <div class="nature tree" style="grid-column: 2; grid-row: 5;">
-                            <div class="trunk"></div>
-                            <div class="leaves"></div>
-                        </div>
-                        
-                        <!-- Tree 2 -->
-                        <div class="nature tree" style="grid-column: 7; grid-row: 6;">
-                            <div class="trunk"></div>
-                            <div class="leaves"></div>
-                        </div>
-                        
-                        <!-- Water Feature -->
-                        <div class="nature pond" style="grid-column: 4; grid-row: 5;">
-                            <div class="water"></div>
-                            <div class="water-ripple"></div>
-                            <div class="water-ripple delay-1"></div>
-                            <div class="water-ripple delay-2"></div>
-                        </div>
-                        
-                        <!-- AQUARIUM - Clickable -->
-                        <div id="aquariumBuilding" class="building aquarium-building" style="grid-column: 5; grid-row: 4;">
-                            <div class="aquarium-3d">
-                                <div class="tank-glass">
-                                    <div class="tank-water"></div>
-                                    <div class="tank-bubbles">
-                                        <div class="bubble"></div>
-                                        <div class="bubble delay-1"></div>
-                                        <div class="bubble delay-2"></div>
-                                        <div class="bubble delay-3"></div>
-                                    </div>
-                                    <div class="fish-tank">
-                                        <div class="tank-fish"></div>
-                                    </div>
-                                </div>
-                                <div class="tank-base"></div>
-                                <div class="click-hint">🖱️ Click to enter!</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Flowers -->
-                        <div class="nature flower" style="grid-column: 1; grid-row: 3;">
-                            <div class="stem"></div>
-                            <div class="petals"></div>
-                        </div>
-                        <div class="nature flower" style="grid-column: 8; grid-row: 3;">
-                            <div class="stem"></div>
-                            <div class="petals pink"></div>
-                        </div>
-                        
-                        <!-- Clouds -->
-                        <div class="cloud" style="top: 10%; left: 20%;">
-                            <div class="cloud-puff"></div>
-                            <div class="cloud-puff"></div>
-                            <div class="cloud-puff"></div>
-                        </div>
-                        <div class="cloud" style="top: 15%; left: 60%; animation-delay: -10s;">
-                            <div class="cloud-puff"></div>
-                            <div class="cloud-puff"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Avatars Container -->
-                    <div id="avatarsContainer" class="avatars-container"></div>
-                    
-                    <!-- Speech Bubbles Container -->
-                    <div id="speechBubbles" class="speech-bubbles-container"></div>
-                </div>
-                
-                <!-- Frutiger Aero Effects -->
-                <div class="aero-effects">
-                    <div class="ambient-glow"></div>
-                    <div class="shimmer-overlay"></div>
-                    <div class="floating-bubbles">
-                        <div class="aero-bubble"></div>
-                        <div class="aero-bubble"></div>
-                        <div class="aero-bubble"></div>
-                        <div class="aero-bubble"></div>
-                        <div class="aero-bubble"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat History Box -->
-        <div id="chatWindow" class="xp-window chat-window minimized">
-            <div class="xp-title-bar chat-header">
-                <span class="xp-icon">💬</span>
-                <span class="xp-title">Chat History</span>
-                <div class="xp-buttons">
-                    <button class="xp-minimize" id="chatMinimize">_</button>
-                    <button class="xp-maximize">□</button>
-                </div>
-            </div>
-            <div class="xp-content chat-content">
-                <div id="chatHistory" class="chat-history"></div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" class="xp-input chat-input" placeholder="Type a message..." maxlength="100">
-                    <button id="sendChat" class="xp-button-small">Send</button>
+                <button class="btn btnPrimary" onclick="register()">Create Account</button>
+                <div class="authToggle">
+                    Have an account? <a onclick="showLogin()">Login</a>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Aquarium Fullscreen Modal -->
-    <div id="aquariumModal" class="fullscreen-modal hidden">
-        <div class="aquarium-room">
-            <div class="aquarium-header">
-                <h2>🐠 Bubble Aquarium</h2>
-                <button id="closeAquarium" class="xp-button-close">✕ Close</button>
-            </div>
-            
-            <div class="aquarium-tank">
-                <div class="tank-background">
-                    <div class="coral coral-1"></div>
-                    <div class="coral coral-2"></div>
-                    <div class="seaweed">
-                        <div class="weed"></div>
-                        <div class="weed"></div>
-                        <div class="weed"></div>
-                    </div>
-                    <div class="sand"></div>
-                </div>
-                
-                <!-- Animated Fish -->
-                <div id="aquariumFish" class="fish-container">
-                    <!-- Clownfish -->
-                    <div class="clownfish" id="clownfish1">
-                        <div class="fish-body">
-                            <div class="stripe"></div>
-                            <div class="stripe"></div>
-                            <div class="fin"></div>
-                            <div class="tail"></div>
-                            <div class="eye"></div>
-                        </div>
-                    </div>
-                    <div class="clownfish" id="clownfish2" style="animation-delay: -2s;">
-                        <div class="fish-body">
-                            <div class="stripe"></div>
-                            <div class="stripe"></div>
-                            <div class="fin"></div>
-                            <div class="tail"></div>
-                            <div class="eye"></div>
-                        </div>
-                    </div>
-                    <div class="clownfish" id="clownfish3" style="animation-delay: -5s;">
-                        <div class="fish-body">
-                            <div class="stripe"></div>
-                            <div class="stripe"></div>
-                            <div class="fin"></div>
-                            <div class="tail"></div>
-                            <div class="eye"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Dolphin (hidden until unlocked) -->
-                <div id="dolphinContainer" class="dolphin-container hidden">
-                    <div class="dolphin">
-                        <div class="dolphin-body"></div>
-                        <div class="dolphin-fin"></div>
-                        <div class="dolphin-tail"></div>
-                    </div>
-                </div>
-                
-                <!-- Bubbles -->
-                <div class="aquarium-bubbles">
-                    <div class="aq-bubble"></div>
-                    <div class="aq-bubble"></div>
-                    <div class="aq-bubble"></div>
-                    <div class="aq-bubble"></div>
-                    <div class="aq-bubble"></div>
-                    <div class="aq-bubble"></div>
-                </div>
-                
-                <!-- Light rays -->
-                <div class="light-rays">
-                    <div class="ray"></div>
-                    <div class="ray"></div>
-                    <div class="ray"></div>
-                </div>
-            </div>
-            
-            <div class="aquarium-info">
-                <div class="time-tracker">
-                    <h3>⏱️ Time Spent: <span id="aquariumTime">0:00</span></h3>
-                    <div class="unlock-progress">
-                        <div class="progress-item" id="clownfishUnlock">
-                            <span class="reward-icon">🐠</span>
-                            <span class="reward-text">Clownfish Pet (1 hour)</span>
-                            <span class="reward-status locked">🔒</span>
-                        </div>
-                        <div class="progress-item" id="dolphinUnlock">
-                            <span class="reward-icon">🐬</span>
-                            <span class="reward-text">Dolphin Pet (6 hours)</span>
-                            <span class="reward-status locked">🔒</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Avatar Customization Modal -->
-    <div id="customizeModal" class="xp-window modal-center hidden">
-        <div class="xp-title-bar">
-            <span class="xp-icon">👤</span>
-            <span class="xp-title">Customize Avatar</span>
-            <div class="xp-buttons">
-                <button class="xp-close" id="closeCustomize">×</button>
-            </div>
-        </div>
-        <div class="xp-content customize-content">
-            <div class="customize-preview">
-                <div id="previewAvatar" class="msn-avatar large"></div>
-            </div>
-            
-            <div class="customize-options">
-                <h3>Choose Color:</h3>
-                <div class="color-picker large">
-                    <div class="color-option" data-color="aqua" style="background: #00CED1;"></div>
-                    <div class="color-option" data-color="sky" style="background: #87CEEB;"></div>
-                    <div class="color-option" data-color="mint" style="background: #98FF98;"></div>
-                    <div class="color-option" data-color="lemon" style="background: #FFFACD;"></div>
-                    <div class="color-option" data-color="pink" style="background: #FFB6C1;"></div>
-                    <div class="color-option" data-color="lavender" style="background: #E6E6FA;"></div>
-                </div>
-                
-                <h3>Your Pets:</h3>
-                <div id="userPets" class="pets-inventory">
-                    <p class="no-pets">Visit the aquarium to unlock pets!</p>
-                </div>
-                
-                <h3>Equip Pet:</h3>
-                <div id="equipPet" class="equip-section">
-                    <select id="petSelect" class="xp-input">
-                        <option value="">No pet</option>
-                    </select>
-                </div>
-            </div>
-            
-            <button id="saveCustomize" class="xp-button-primary">Save Changes</button>
-        </div>
-    </div>
-
-    <!-- User Info Bar -->
-    <div id="userBar" class="user-bar hidden">
-        <div class="user-info">
-            <div id="userAvatarSmall" class="msn-avatar small"></div>
-            <span id="userName">User</span>
-        </div>
-        <button id="logoutBtn" class="xp-button-small">Logout</button>
-    </div>
-
-    <!-- Admin Panel (Admin only) -->
-    <div id="adminPanel" class="xp-window admin-panel hidden">
-        <div class="xp-title-bar">
-            <span class="xp-icon">🛡️</span>
-            <span class="xp-title">Admin Panel</span>
-            <div class="xp-buttons">
-                <button class="xp-minimize" id="adminMinimize">_</button>
-                <button class="xp-close" id="adminClose">×</button>
-            </div>
-        </div>
-        <div class="xp-content admin-content">
-            <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="reports">Reports</button>
-                <button class="admin-tab" data-tab="users">Users</button>
-            </div>
-            
-            <div id="reportsTab" class="admin-tab-content">
-                <h3>Pending Reports</h3>
-                <div id="reportsList" class="reports-list">
-                    <p class="no-reports">No pending reports</p>
-                </div>
-            </div>
-            
-            <div id="usersTab" class="admin-tab-content hidden">
-                <h3>User Management</h3>
-                <div class="block-user-form">
-                    <input type="text" id="blockUserId" class="xp-input" placeholder="User ID to block">
-                    <input type="text" id="blockReason" class="xp-input" placeholder="Reason for blocking">
-                    <button id="blockUserBtn" class="xp-button-warning">Block User</button>
-                </div>
-                <div id="blockedUsersList" class="blocked-users-list">
-                    <h4>Blocked Users</h4>
-                    <p class="no-blocked">No blocked users</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Friends Panel -->
-    <div id="friendsPanel" class="xp-window friends-panel hidden">
-        <div class="xp-title-bar">
-            <span class="xp-icon">👥</span>
-            <span class="xp-title">Friends</span>
-            <div class="xp-buttons">
-                <button class="xp-minimize" id="friendsMinimize">_</button>
-                <button class="xp-close" id="friendsClose">×</button>
-            </div>
-        </div>
-        <div class="xp-content friends-content">
-            <div class="friends-tabs">
-                <button class="friends-tab active" data-tab="friends">My Friends</button>
-                <button class="friends-tab" data-tab="requests">Requests</button>
-                <button class="friends-tab" data-tab="add">Add Friend</button>
-            </div>
-            
-            <div id="friendsListTab" class="friends-tab-content">
-                <div id="friendsList" class="friends-list">
-                    <p class="no-friends">No friends yet. Send a friend request!</p>
-                </div>
-            </div>
-            
-            <div id="requestsTab" class="friends-tab-content hidden">
-                <div id="friendRequestsList" class="requests-list">
-                    <p class="no-requests">No pending requests</p>
-                </div>
-            </div>
-            
-            <div id="addFriendTab" class="friends-tab-content hidden">
-                <div class="add-friend-form">
-                    <input type="text" id="friendSearchInput" class="xp-input" placeholder="Enter username to add">
-                    <button id="searchFriendBtn" class="xp-button-primary">Search</button>
-                </div>
-                <div id="searchResults" class="search-results"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Private Messages Panel -->
-    <div id="pmPanel" class="xp-window pm-panel hidden">
-        <div class="xp-title-bar">
-            <span class="xp-icon">💌</span>
-            <span class="xp-title">Private Messages</span>
-            <div class="xp-buttons">
-                <button class="xp-minimize" id="pmMinimize">_</button>
-                <button class="xp-close" id="pmClose">×</button>
-            </div>
-        </div>
-        <div class="xp-content pm-content">
-            <div class="pm-layout">
-                <div class="pm-conversations">
-                    <h4>Conversations</h4>
-                    <div id="pmConversationsList" class="conversations-list">
-                        <p class="no-conversations">No conversations yet</p>
-                    </div>
-                </div>
-                <div class="pm-chat-area">
-                    <div id="pmChatHeader" class="pm-chat-header">
-                        <span>Select a conversation</span>
-                    </div>
-                    <div id="pmMessages" class="pm-messages"></div>
-                    <div class="pm-input-area">
-                        <input type="text" id="pmInput" class="xp-input pm-input" placeholder="Type a private message..." maxlength="200">
-                        <button id="sendPmBtn" class="xp-button-small">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Emotes Menu -->
-    <div id="emotesMenu" class="emotes-menu hidden">
-        <div class="emotes-grid">
-            <button class="emote-btn" data-emote="wave">👋</button>
-            <button class="emote-btn" data-emote="heart">❤️</button>
-            <button class="emote-btn" data-emote="laugh">😄</button>
-            <button class="emote-btn" data-emote="sad">😢</button>
-            <button class="emote-btn" data-emote="dance">💃</button>
-            <button class="emote-btn" data-emote="sleep">😴</button>
-            <button class="emote-btn" data-emote="music">🎵</button>
-            <button class="emote-btn" data-emote="sparkle">✨</button>
-        </div>
-    </div>
-
-    <!-- Audio Elements -->
-    <audio id="ambientMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    </audio>
     
-    <audio id="bubbleSound">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmFgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
-    </audio>
+    <!-- Game Screen -->
+    <div id="gameScreen">
+        <div id="worldContainer">
+            <div id="world">
+                <div class="aquariumBuilding" onclick="openAquarium()"></div>
+            </div>
+        </div>
+        
+        <!-- Mobile Controls -->
+        <div id="mobileControls">
+            <div class="dPad">
+                <button class="dPadBtn dPadUp" ontouchstart="move('up')" onmousedown="move('up')">⬆️</button>
+                <button class="dPadBtn dPadDown" ontouchstart="move('down')" onmousedown="move('down')">⬇️</button>
+                <button class="dPadBtn dPadLeft" ontouchstart="move('left')" onmousedown="move('left')">⬅️</button>
+                <button class="dPadBtn dPadRight" ontouchstart="move('right')" onmousedown="move('right')">➡️</button>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <h3>👤 <span id="playerName">Player</span></h3>
+            <div class="sidebarItem">🐠 Clownfish: <span id="hasClownfish">❌</span></div>
+            <div class="sidebarItem">🐬 Dolphin: <span id="hasDolphin">❌</span></div>
+            <h3>🎮 Online</h3>
+            <div id="onlineList"></div>
+        </div>
+        
+        <!-- Chat -->
+        <div id="chatContainer">
+            <div id="chatMessages"></div>
+            <div id="chatInputArea">
+                <input type="text" id="chatInput" placeholder="Type message..." onkeypress="if(event.key==='Enter')sendChat()">
+                <button id="chatSend" onclick="sendChat()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Aquarium Modal -->
+    <div id="aquariumModal">
+        <button class="closeAquarium" onclick="closeAquarium()">✕ Leave</button>
+        <div class="aquariumTimer" id="aquariumTimer">00:00:00</div>
+        <div class="fish" style="top:20%; animation-delay:0s;">🐠</div>
+        <div class="fish" style="top:40%; animation-delay:2s;">🐟</div>
+        <div class="fish" style="top:60%; animation-delay:4s;">🐡</div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
 
-    <!-- Main App Module -->
-    <script type="module" src="js/app.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    
-    <!-- Auth script -->
     <script>
-        // Firebase config
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyABei0Z3yZ3xV741mW3ekV2ibFEf9QlCjc",
             authDomain: "bubble-town-25f24.firebaseapp.com",
@@ -560,48 +270,296 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const database = firebase.database();
+        const db = firebase.database();
         
-        // Google sign-in handler
-        function signInWithGoogle() {
-            console.log('Starting Google sign-in...');
+        // Game State
+        let user = null;
+        let userData = {};
+        let playerPos = { x: 1000, y: 1000 };
+        let avatar = null;
+        let aquariumTime = 0;
+        let aquariumInterval = null;
+        let keys = {};
+        
+        // Auth Functions
+        function showError(msg) {
+            document.getElementById('errorMsg').textContent = msg;
+        }
+        
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            showError('');
+        }
+        
+        function showLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            showError('');
+        }
+        
+        function calculateAge(birthdate) {
+            const birth = new Date(birthdate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+            return age;
+        }
+        
+        function register() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const birthdate = document.getElementById('regBirthdate').value;
+            const ageConfirm = document.getElementById('ageConfirm').checked;
+            
+            if (!name || !email || !password || !birthdate) {
+                showError('Please fill all fields');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Password must be 6+ characters');
+                return;
+            }
+            if (!ageConfirm) {
+                showError('You must confirm you are 13+');
+                return;
+            }
+            
+            const age = calculateAge(birthdate);
+            if (age < 13) {
+                showError('You must be at least 13 years old');
+                return;
+            }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((cred) => {
+                    const isAdmin = email === 'a.hannaway.contact@gmail.com';
+                    return db.ref('users/' + cred.user.uid).set({
+                        name: name,
+                        email: email,
+                        age: age,
+                        isAdult: age >= 18,
+                        isAdmin: isAdmin,
+                        clownfish: isAdmin,
+                        dolphin: isAdmin,
+                        x: 1000,
+                        y: 1000,
+                        online: true
+                    });
+                })
+                .then(() => showToast('Account created!'))
+                .catch(err => showError(err.message));
+        }
+        
+        function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(err => showError(err.message));
+        }
+        
+        function googleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider)
-                .then((result) => {
-                    console.log('Google sign-in successful:', result.user);
-                })
-                .catch((error) => {
-                    console.error('Google sign-in error:', error);
-                    alert('Sign-in error: ' + error.message);
-                });
+                .catch(err => showError(err.message));
         }
         
-        // Email login handler
-        function signInWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .catch((error) => alert('Login error: ' + error.message));
+        // Game Functions
+        function startGame() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            // Create avatar
+            avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.style.background = '#ff6b6b';
+            avatar.innerHTML = '😊<div class="avatarName">' + userData.name + '</div>';
+            document.getElementById('world').appendChild(avatar);
+            updateAvatarPos();
+            
+            // Update sidebar
+            document.getElementById('playerName').textContent = userData.name;
+            document.getElementById('hasClownfish').textContent = userData.clownfish ? '✅' : '❌';
+            document.getElementById('hasDolphin').textContent = userData.dolphin ? '✅' : '❌';
+            
+            // Keyboard controls
+            document.addEventListener('keydown', (e) => {
+                keys[e.key.toLowerCase()] = true;
+                handleMovement();
+            });
+            document.addEventListener('keyup', (e) => {
+                keys[e.key.toLowerCase()] = false;
+            });
+            
+            // Save position to database
+            setInterval(() => {
+                if (user) {
+                    db.ref('users/' + user.uid).update({ x: playerPos.x, y: playerPos.y });
+                }
+            }, 1000);
+            
+            // Listen for other players
+            db.ref('users').on('value', (snapshot) => {
+                const users = snapshot.val();
+                let onlineHtml = '';
+                for (const uid in users) {
+                    if (uid !== user.uid && users[uid].online) {
+                        onlineHtml += '<div class="sidebarItem">' + users[uid].name + '</div>';
+                    }
+                }
+                document.getElementById('onlineList').innerHTML = onlineHtml || '<div class="sidebarItem">No one else online</div>';
+            });
         }
         
-        // Register handler
-        function registerWithEmail() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            auth.createUserWithEmailAndPassword(email, password)
-                .catch((error) => alert('Registration error: ' + error.message));
+        function handleMovement() {
+            const speed = 5;
+            if (keys['w'] || keys['arrowup']) playerPos.y -= speed;
+            if (keys['s'] || keys['arrowdown']) playerPos.y += speed;
+            if (keys['a'] || keys['arrowleft']) playerPos.x -= speed;
+            if (keys['d'] || keys['arrowright']) playerPos.x += speed;
+            
+            // Bounds
+            playerPos.x = Math.max(0, Math.min(2000, playerPos.x));
+            playerPos.y = Math.max(0, Math.min(2000, playerPos.y));
+            
+            updateAvatarPos();
         }
         
-        // Auth state listener
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('authModal').style.display = 'none';
-                document.getElementById('gameInterface').classList.remove('hidden');
-            } else {
-                document.getElementById('authModal').style.display = 'block';
-                document.getElementById('gameInterface').classList.add('hidden');
+        function move(direction) {
+            const speed = 20;
+            if (direction === 'up') playerPos.y -= speed;
+            if (direction === 'down') playerPos.y += speed;
+            if (direction === 'left') playerPos.x -= speed;
+            if (direction === 'right') playerPos.x += speed;
+            
+            playerPos.x = Math.max(0, Math.min(2000, playerPos.x));
+            playerPos.y = Math.max(0, Math.min(2000, playerPos.y));
+            updateAvatarPos();
+        }
+        
+        function updateAvatarPos() {
+            if (avatar) {
+                avatar.style.left = playerPos.x + 'px';
+                avatar.style.top = playerPos.y + 'px';
+            }
+        }
+        
+        // Chat
+        function sendChat() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            if (!userData.isAdult) {
+                showToast('Chat is 18+ only');
+                return;
+            }
+            
+            // Check for links
+            if (text.includes('http') || text.includes('www')) {
+                showToast('Links not allowed');
+                return;
+            }
+            
+            // Profanity filter
+            const badWords = ['fuck', 'shit', 'damn', 'bitch', 'ass'];
+            let filtered = text;
+            badWords.forEach(word => {
+                filtered = filtered.replace(new RegExp(word, 'gi'), '***');
+            });
+            
+            const msg = document.createElement('div');
+            msg.className = 'chatMsg';
+            msg.innerHTML = '<span class="user">' + userData.name + ':</span> ' + filtered;
+            document.getElementById('chatMessages').appendChild(msg);
+            document.getElementById('chatMessages').scrollTop = 999999;
+            
+            // Save to database
+            db.ref('chat').push({
+                name: userData.name,
+                text: filtered,
+                time: Date.now()
+            });
+            
+            input.value = '';
+        }
+        
+        // Load chat history
+        db.ref('chat').limitToLast(50).on('child_added', (snapshot) => {
+            const msg = snapshot.val();
+            const div = document.createElement('div');
+            div.className = 'chatMsg';
+            div.innerHTML = '<span class="user">' + msg.name + ':</span> ' + msg.text;
+            const container = document.getElementById('chatMessages');
+            if (container) {
+                container.appendChild(div);
+                container.scrollTop = 999999;
             }
         });
+        
+        // Aquarium
+        function openAquarium() {
+            document.getElementById('aquariumModal').style.display = 'flex';
+            aquariumTime = 0;
+            aquariumInterval = setInterval(() => {
+                aquariumTime++;
+                const hrs = Math.floor(aquariumTime / 3600);
+                const mins = Math.floor((aquariumTime % 3600) / 60);
+                const secs = aquariumTime % 60;
+                document.getElementById('aquariumTimer').textContent = 
+                    String(hrs).padStart(2,'0') + ':' + String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+                
+                // Check rewards
+                if (aquariumTime >= 3600 && !userData.clownfish) {
+                    userData.clownfish = true;
+                    db.ref('users/' + user.uid).update({ clownfish: true });
+                    showToast('🐠 You got a Clownfish!');
+                    document.getElementById('hasClownfish').textContent = '✅';
+                }
+                if (aquariumTime >= 21600 && !userData.dolphin) {
+                    userData.dolphin = true;
+                    db.ref('users/' + user.uid).update({ dolphin: true });
+                    showToast('🐬 You got a Dolphin!');
+                    document.getElementById('hasDolphin').textContent = '✅';
+                }
+            }, 1000);
+        }
+        
+        function closeAquarium() {
+            document.getElementById('aquariumModal').style.display = 'none';
+            clearInterval(aquariumInterval);
+        }
+        
+        // Auth State
+        auth.onAuthStateChanged((u) => {
+            if (u) {
+                user = u;
+                db.ref('users/' + u.uid).once('value').then((snap) => {
+                    userData = snap.val() || {};
+                    if (!userData.name) userData.name = u.displayName || 'Player';
+                    db.ref('users/' + u.uid).update({ online: true });
+                    startGame();
+                });
+            }
+        });
+        
+        // Set offline on disconnect
+        window.onbeforeunload = () => {
+            if (user) {
+                db.ref('users/' + user.uid).update({ online: false });
+            }
+        };
     </script>
 </body>
 </html>
